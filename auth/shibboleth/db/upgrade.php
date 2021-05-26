@@ -69,5 +69,25 @@ function xmldb_auth_shibboleth_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2020061501, 'auth', 'shibboleth');
     }
 
+    if ($oldversion < 2020061502) {
+
+        global $DB;
+        $dbman = $DB->get_manager();
+
+        $table = new xmldb_table('shibboleth_session');
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, 10, null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('shibboleth_id', XMLDB_TYPE_CHAR, 200, null, XMLDB_NOTNULL, null, '0');
+        $table->add_field('session_id', XMLDB_TYPE_CHAR, 200, null, XMLDB_NOTNULL, null, '0');
+
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_index('shibboleth_id', XMLDB_INDEX_UNIQUE, ['shibboleth_id']);
+
+        $dbman->create_table($table);
+
+        upgrade_plugin_savepoint(true, 2020061502, 'auth', 'shibboleth');
+    }
+
     return true;
 }

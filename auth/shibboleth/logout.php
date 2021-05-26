@@ -4,6 +4,8 @@
 // - https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPLogoutInitiator
 // - https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPNotify
 
+use auth_shibboleth\helper;
+
 require_once("../../config.php");
 
 require_once($CFG->dirroot."/auth/shibboleth/auth.php");
@@ -124,17 +126,9 @@ WSDL;
  * Handles SOAP Back-channel logout notification
  *
  * @param string $spsessionid SP-provided Shibboleth Session ID
- * @return SoapFault or void if everything was fine
+ * @throws dml_exception
  */
 function LogoutNotification($spsessionid) {
-    $sessionclass = \core\session\manager::get_handler_class();
-    switch ($sessionclass) {
-        case '\core\session\file':
-            return \auth_shibboleth\helper::logout_file_session($spsessionid);
-        case '\core\session\database':
-            return \auth_shibboleth\helper::logout_db_session($spsessionid);
-        default:
-            throw new moodle_exception("Shibboleth logout not implemented for '$sessionclass'");
-    }
+    return helper::logout_session($spsessionid);
     // If no SoapFault was thrown, the function will return OK as the SP assumes.
 }
